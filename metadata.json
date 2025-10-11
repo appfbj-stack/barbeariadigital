@@ -1,0 +1,5 @@
+{
+  "name": "BarberTime+",
+  "description": "BarberTime+ is a PWA that allows customers to view available times and schedule hair, beard, or combo services with one of three barbers. The system simplifies the routine for professionals and offers a modern, intuitive, and fast experience for the customer.",
+  "requestFramePermissions": []
+}
