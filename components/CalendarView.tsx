@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Appointment } from '../types';
+import type { LegacyAppointment } from '../types';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons';
 
 interface CalendarViewProps {
-    appointments: Appointment[];
+    appointments: LegacyAppointment[];
     currentDate: Date;
     selectedDate: Date;
     onDateSelect: (date: Date) => void;

@@ -2,18 +2,18 @@ import React, { useState } from 'react';
 import CalendarView from './CalendarView';
 import DayDetailView from './DayDetailView';
 import ManagementPanel from './ManagementPanel';
-import type { Appointment, Barber, Service, ShopInfo } from '../types';
+import type { LegacyAppointment, LegacyBarber, LegacyService, ShopInfo } from '../types';
 
 interface AdminDashboardProps {
-  appointments: Appointment[];
-  barbers: Barber[];
-  services: Service[];
+  appointments: LegacyAppointment[];
+  barbers: LegacyBarber[];
+  services: LegacyService[];
   shopInfo: ShopInfo;
-  onAddService: (service: Omit<Service, 'id'>) => void;
-  onUpdateService: (service: Service) => void;
+  onAddService: (service: Omit<LegacyService, 'id'>) => void;
+  onUpdateService: (service: LegacyService) => void;
   onDeleteService: (id: number) => void;
-  onAddBarber: (barber: Omit<Barber, 'id'>) => void;
-  onUpdateBarber: (barber: Barber) => void;
+  onAddBarber: (barber: Omit<LegacyBarber, 'id'>) => void;
+  onUpdateBarber: (barber: LegacyBarber) => void;
   onDeleteBarber: (id: number) => void;
   onUpdateShopInfo: (info: ShopInfo) => void;
 }

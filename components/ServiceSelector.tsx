@@ -1,10 +1,10 @@
 import React from 'react';
-import type { Service } from '../types';
+import type { LegacyService } from '../types';
 import { ScissorsIcon, BeardIcon, ComboIcon } from './icons';
 
 interface ServiceSelectorProps {
-  services: Service[];
-  onSelect: (service: Service) => void;
+  services: LegacyService[];
+  onSelect: (service: LegacyService) => void;
 }
 
 const ServiceIcon = ({ serviceName, className }: { serviceName: string, className: string }) => {

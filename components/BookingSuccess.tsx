@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Appointment } from '../types';
+import type { LegacyAppointment } from '../types';
 import { CheckCircleIcon } from './icons';
 
 interface BookingSuccessProps {
-  appointment: Appointment;
+  appointment: LegacyAppointment;
   onReset: () => void;
 }
 

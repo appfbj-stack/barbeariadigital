@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import type { Barber, Service, ShopInfo } from '../types';
+import type { LegacyBarber, LegacyService, ShopInfo } from '../types';
 import { PencilIcon, TrashIcon, PlusCircleIcon } from './icons';
 
 interface ManagementPanelProps {
-    barbers: Barber[];
-    services: Service[];
+    barbers: LegacyBarber[];
+    services: LegacyService[];
     shopInfo: ShopInfo;
-    onAddService: (service: Omit<Service, 'id'>) => void;
-    onUpdateService: (service: Service) => void;
+    onAddService: (service: Omit<LegacyService, 'id'>) => void;
+    onUpdateService: (service: LegacyService) => void;
     onDeleteService: (id: number) => void;
-    onAddBarber: (barber: Omit<Barber, 'id'>) => void;
-    onUpdateBarber: (barber: Barber) => void;
+    onAddBarber: (barber: Omit<LegacyBarber, 'id'>) => void;
+    onUpdateBarber: (barber: LegacyBarber) => void;
     onDeleteBarber: (id: number) => void;
     onUpdateShopInfo: (info: ShopInfo) => void;
 }

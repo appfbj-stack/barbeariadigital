@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Appointment } from '../types';
+import type { LegacyAppointment } from '../types';
 
 interface DayDetailViewProps {
   selectedDate: Date;
-  appointments: Appointment[];
+  appointments: LegacyAppointment[];
 }
 
 const DayDetailView: React.FC<DayDetailViewProps> = ({ selectedDate, appointments }) => {

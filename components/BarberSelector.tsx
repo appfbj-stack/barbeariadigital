@@ -1,9 +1,9 @@
 import React from 'react';
-import type { Barber } from '../types';
+import type { LegacyBarber } from '../types';
 
 interface BarberSelectorProps {
-  barbers: Barber[];
-  onSelect: (barber: Barber) => void;
+  barbers: LegacyBarber[];
+  onSelect: (barber: LegacyBarber) => void;
 }
 
 const BarberSelector: React.FC<BarberSelectorProps> = ({ barbers, onSelect }) => {

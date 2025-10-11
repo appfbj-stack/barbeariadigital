@@ -1,12 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import { TIME_SLOTS } from '../constants';
 import { ChevronLeftIcon, ChevronRightIcon } from './icons';
-import type { Appointment, Barber } from '../types';
+import type { LegacyAppointment, LegacyBarber } from '../types';
 
 interface DateTimePickerProps {
   onSelect: (date: Date, time: string) => void;
-  barber: Barber | undefined;
-  appointments: Appointment[];
+  barber: LegacyBarber | undefined;
+  appointments: LegacyAppointment[];
 }
 
 const getNextValidDays = (count: number): Date[] => {

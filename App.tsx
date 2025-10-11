@@ -9,7 +9,18 @@ import BookingSummary from './components/BookingSummary';
 import BookingSuccess from './components/BookingSuccess';
 import AdminDashboard from './components/AdminDashboard';
 import { INITIAL_SERVICES, INITIAL_BARBERS } from './constants';
-import type { Service, Barber, Appointment, PartialAppointment, ShopInfo } from './types';
+import type { 
+  Service, 
+  Barber, 
+  Appointment, 
+  PartialAppointment, 
+  ShopInfo,
+  LegacyService,
+  LegacyBarber,
+  LegacyAppointment
+} from './types';
+import { convertServiceToLegacy, convertBarberToLegacy } from './types';
+import { getBarbeiros, getServicos, criarAgendamento } from './services/supabaseService';
 
 // --- LocalStorage Persistence ---
 
@@ -23,7 +34,7 @@ const getInitialShopInfo = (): ShopInfo => {
   }
 };
 
-const getInitialServices = (): Service[] => {
+const getInitialServices = (): LegacyService[] => {
   try {
     const item = window.localStorage.getItem('barberShopServices');
     return item ? JSON.parse(item) : INITIAL_SERVICES;
@@ -33,7 +44,7 @@ const getInitialServices = (): Service[] => {
   }
 };
 
-const getInitialBarbers = (): Barber[] => {
+const getInitialBarbers = (): LegacyBarber[] => {
   try {
     const item = window.localStorage.getItem('barberShopBarbers');
     return item ? JSON.parse(item) : INITIAL_BARBERS;
@@ -43,7 +54,7 @@ const getInitialBarbers = (): Barber[] => {
   }
 };
 
-const getInitialAppointments = (): Appointment[] => {
+const getInitialAppointments = (): LegacyAppointment[] => {
   try {
     const item = window.localStorage.getItem('barberShopAppointments');
     if (!item) return [];
@@ -65,12 +76,69 @@ const App: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [appointment, setAppointment] = useState<PartialAppointment>({});
   
-  const [allAppointments, setAllAppointments] = useState<Appointment[]>(getInitialAppointments);
-  const [services, setServices] = useState<Service[]>(getInitialServices);
-  const [barbers, setBarbers] = useState<Barber[]>(getInitialBarbers);
+  const [allAppointments, setAllAppointments] = useState<LegacyAppointment[]>(getInitialAppointments);
+  const [services, setServices] = useState<LegacyService[]>(getInitialServices);
+  const [barbers, setBarbers] = useState<LegacyBarber[]>(getInitialBarbers);
   const [shopInfo, setShopInfo] = useState<ShopInfo>(getInitialShopInfo);
 
   const [bookingComplete, setBookingComplete] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  // --- Carregar dados do Supabase ---
+  useEffect(() => {
+    const loadSupabaseData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        // Carregar barbeiros e serviços em paralelo
+        const [barbeirosData, servicosData] = await Promise.all([
+          getBarbeiros(),
+          getServicos()
+        ]);
+        
+        // Converter para formato legacy para compatibilidade
+        const legacyBarbers = barbeirosData.map(convertBarberToLegacy);
+        const legacyServices = servicosData.map(convertServiceToLegacy);
+        
+        // Log para debug dos IDs convertidos
+        console.log('🔄 Conversão de IDs:');
+        barbeirosData.forEach((original, index) => {
+          console.log(`Barbeiro ${index}: ${original.id} → ${legacyBarbers[index].id}`);
+        });
+        servicosData.forEach((original, index) => {
+          console.log(`Serviço ${index}: ${original.id} → ${legacyServices[index].id}`);
+        });
+        
+        // Atualizar estados apenas se temos dados
+        if (legacyBarbers.length > 0) {
+          setBarbers(legacyBarbers);
+        }
+        
+        if (legacyServices.length > 0) {
+          setServices(legacyServices);
+        }
+        
+        console.log('✅ Dados carregados do Supabase:', {
+          barbeiros: legacyBarbers.length,
+          servicos: legacyServices.length
+        });
+        
+      } catch (err) {
+        console.error('❌ Erro ao carregar dados do Supabase:', err);
+        setError('Erro ao conectar com o banco de dados. Usando dados locais.');
+        
+        // Em caso de erro, usar dados locais como fallback
+        setBarbers(getInitialBarbers());
+        setServices(getInitialServices());
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadSupabaseData();
+  }, []);
   
   // --- useEffects for persistence ---
   useEffect(() => {
@@ -152,12 +220,72 @@ const App: React.FC = () => {
     setAppointment(prev => ({ ...prev, date, time }));
   };
 
-  const handleConfirm = (clientName: string, clientPhone: string) => {
-    const finalAppointment = { ...appointment, clientName, clientPhone } as Appointment;
-    setAllAppointments(prev => [...prev, finalAppointment]);
-    setAppointment(finalAppointment);
-    setBookingComplete(true);
-    setCurrentStep(5); // Success step
+  const handleConfirm = async (clientName: string, clientPhone: string) => {
+    try {
+      setLoading(true);
+      
+      const finalAppointment = { ...appointment, clientName, clientPhone } as LegacyAppointment;
+      
+      // Preparar dados para o Supabase
+      if (appointment.barber && appointment.service && appointment.date && appointment.time) {
+        // Encontrar IDs originais do Supabase
+        const barbeirosData = await getBarbeiros();
+        const servicosData = await getServicos();
+        
+        // Busca simplificada usando nome como chave secundária
+        const barbeiroOriginal = barbeirosData.find(b => b.nome === appointment.barber!.name);
+        const servicoOriginal = servicosData.find(s => s.nome === appointment.service!.name);
+        
+        if (barbeiroOriginal && servicoOriginal) {
+          // Criar data/hora completa
+          const [hours, minutes] = appointment.time.split(':').map(Number);
+          const dataAgendamento = new Date(appointment.date);
+          dataAgendamento.setHours(hours, minutes, 0, 0);
+          
+          // Criar agendamento no Supabase
+          const novoAgendamento = {
+            cliente_nome: clientName,
+            cliente_telefone: clientPhone,
+            barbeiro_id: barbeiroOriginal.id,
+            servico_id: servicoOriginal.id,
+            data_agendamento: dataAgendamento.toISOString(),
+            status: 'agendado' as const
+          };
+          
+          try {
+            const agendamentoCriado = await criarAgendamento(novoAgendamento);
+            
+            // Adicionar à lista local para exibição imediata
+            setAllAppointments(prev => [...prev, finalAppointment]);
+            setAppointment(finalAppointment);
+            setBookingComplete(true);
+            setCurrentStep(5); // Success step
+            setError(null);
+            
+          } catch (err) {
+            console.error('Erro ao criar agendamento:', err);
+            setError('Erro ao salvar agendamento. Tente novamente.');
+            setCurrentStep(5);
+          }
+        } else {
+          throw new Error('Barbeiro ou serviço não encontrado');
+        }
+      } else {
+        throw new Error('Dados do agendamento incompletos');
+      }
+    } catch (err) {
+      console.error('Erro ao confirmar agendamento:', err);
+      setError('Erro ao salvar agendamento. Tente novamente.');
+      
+      // Em caso de erro, ainda permite continuar localmente
+      const finalAppointment = { ...appointment, clientName, clientPhone } as LegacyAppointment;
+      setAllAppointments(prev => [...prev, finalAppointment]);
+      setAppointment(finalAppointment);
+      setBookingComplete(true);
+      setCurrentStep(5);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleGoBack = () => {
@@ -206,6 +334,19 @@ const App: React.FC = () => {
     }
   }
 
+  // Componente de carregamento
+  if (loading) {
+    return (
+      <div className="bg-gray-900 text-white min-h-screen font-sans flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-amber-400 mx-auto mb-4"></div>
+          <h2 className="text-2xl font-semibold text-amber-400">Carregando BarberTime+</h2>
+          <p className="text-gray-400 mt-2">Conectando com o banco de dados...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans">
       <div className="container mx-auto p-4">
@@ -215,6 +356,23 @@ const App: React.FC = () => {
           shopName={shopInfo.name}
           logoUrl={shopInfo.logoUrl}
         />
+        
+        {/* Mensagem de erro se houver */}
+        {error && (
+          <div className="bg-red-900 border border-red-700 text-red-100 px-4 py-3 rounded-lg mb-4">
+            <div className="flex items-center">
+              <span className="text-red-400 mr-2">⚠️</span>
+              <span>{error}</span>
+              <button 
+                onClick={() => setError(null)}
+                className="ml-auto text-red-400 hover:text-red-300"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+        
         {currentView === 'booking' ? (
           <>
             <main className="mt-8">
