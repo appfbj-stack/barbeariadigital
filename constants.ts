@@ -1,6 +1,6 @@
-import type { Service, Barber } from './types';
+import type { LegacyService, LegacyBarber } from './types';
 
-export const INITIAL_SERVICES: Service[] = [
+export const INITIAL_SERVICES: LegacyService[] = [
   { id: 1, name: 'Corte de Cabelo', description: 'Corte moderno e estilizado com tesoura e máquina.', price: 50, duration: 45 },
   { id: 2, name: 'Barba', description: 'Modelagem e aparo da barba com toalha quente e navalha.', price: 40, duration: 30 },
   { id: 3, name: 'Combo (Corte + Barba)', description: 'O pacote completo para um visual impecável.', price: 85, duration: 75 },
@@ -8,7 +8,7 @@ export const INITIAL_SERVICES: Service[] = [
   { id: 5, name: 'Hidratação de Barba', description: 'Tratamento com óleos especiais para fortalecer e dar brilho à barba.', price: 30, duration: 20 },
 ];
 
-export const INITIAL_BARBERS: Barber[] = [
+export const INITIAL_BARBERS: LegacyBarber[] = [
   { id: 1, name: 'Jonas "Navalha"', avatarUrl: 'https://i.pravatar.cc/150?u=jonas' },
   { id: 2, name: 'Ricardo "Tesoura"', avatarUrl: 'https://i.pravatar.cc/150?u=ricardo' },
   { id: 3, name: 'Fernando "Estilo"', avatarUrl: 'https://i.pravatar.cc/150?u=fernando' },
