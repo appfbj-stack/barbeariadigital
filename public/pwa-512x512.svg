@@ -1,0 +1,28 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="512" height="512" rx="64" fill="#1f2937"/>
+  <rect x="32" y="32" width="448" height="448" rx="32" fill="#374151"/>
+  
+  <!-- Tesoura estilizada (maior) -->
+  <g transform="translate(256, 256)">
+    <!-- Cabo da tesoura -->
+    <circle cx="-60" cy="-45" r="24" fill="#fbbf24" stroke="#f59e0b" stroke-width="4"/>
+    <circle cx="-60" cy="45" r="24" fill="#fbbf24" stroke="#f59e0b" stroke-width="4"/>
+    
+    <!-- Lâminas -->
+    <path d="M-36 -45 L60 -15 L75 -24 L60 -6 L-36 -45Z" fill="#e5e7eb" stroke="#d1d5db" stroke-width="3"/>
+    <path d="M-36 45 L60 15 L75 24 L60 6 L-36 45Z" fill="#e5e7eb" stroke="#d1d5db" stroke-width="3"/>
+    
+    <!-- Pente -->
+    <rect x="90" y="-36" width="75" height="72" rx="6" fill="#6b7280" stroke="#4b5563" stroke-width="3"/>
+    <rect x="96" y="-30" width="6" height="60" fill="#374151"/>
+    <rect x="108" y="-30" width="6" height="60" fill="#374151"/>
+    <rect x="120" y="-30" width="6" height="60" fill="#374151"/>
+    <rect x="132" y="-30" width="6" height="60" fill="#374151"/>
+    <rect x="144" y="-30" width="6" height="60" fill="#374151"/>
+    <rect x="156" y="-30" width="6" height="60" fill="#374151"/>
+  </g>
+  
+  <!-- Texto BarberTime+ -->
+  <text x="256" y="400" text-anchor="middle" fill="#fbbf24" font-family="Arial, sans-serif" font-size="36" font-weight="bold">BarberTime+</text>
+  <text x="256" y="440" text-anchor="middle" fill="#9ca3af" font-family="Arial, sans-serif" font-size="18">Agendamento Profissional</text>
+</svg>
