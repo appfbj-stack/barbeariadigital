@@ -20,6 +20,7 @@ import type {
   LegacyAppointment
 } from './types';
 import { convertServiceToLegacy, convertBarberToLegacy } from './types';
+
 import { getBarbeiros, getServicos, criarAgendamento } from './services/supabaseService';
 
 // --- LocalStorage Persistence ---
@@ -72,6 +73,7 @@ const getInitialAppointments = (): LegacyAppointment[] => {
 type View = 'booking' | 'admin';
 
 const App: React.FC = () => {
+
   const [currentView, setCurrentView] = useState<View>('booking');
   const [currentStep, setCurrentStep] = useState(1);
   const [appointment, setAppointment] = useState<PartialAppointment>({});

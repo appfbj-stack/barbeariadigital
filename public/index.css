@@ -1,0 +1,76 @@
+/* BarberTime+ - Estilos Base */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Teko', sans-serif;
+  background-color: #111827;
+  color: #f9fafb;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Garantir que o aplicativo seja visível */
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+}
+
+/* Estilos para botões */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+}
+
+/* Animações suaves */
+.fade-in {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+}
+
+/* Garantir visibilidade do texto */
+.text-visible {
+  color: #f9fafb !important;
+  opacity: 1 !important;
+}
+
+/* Debug - remover após teste */
+.debug-visible {
+  background-color: #ef4444 !important;
+  color: #ffffff !important;
+  border: 2px solid #22c55e !important;
+  min-height: 50px !important;
+  display: block !important;
+  visibility: visible !important;
+}
