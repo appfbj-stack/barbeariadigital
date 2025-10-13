@@ -31,7 +31,7 @@ const ManagementPanel: React.FC<ManagementPanelProps> = ({
     const [modalConfig, setModalConfig] = useState<{
         type: 'service' | 'barber';
         mode: 'add' | 'edit';
-        data?: Service | Barber;
+        data?: LegacyService | LegacyBarber;
     } | null>(null);
     const [formData, setFormData] = useState<any>({});
     const [shopSettings, setShopSettings] = useState<ShopInfo>(shopInfo);
@@ -51,7 +51,7 @@ const ManagementPanel: React.FC<ManagementPanelProps> = ({
         }
     }, [modalConfig]);
 
-    const handleOpenModal = (type: 'service' | 'barber', mode: 'add' | 'edit', data?: Service | Barber) => {
+    const handleOpenModal = (type: 'service' | 'barber', mode: 'add' | 'edit', data?: LegacyService | LegacyBarber) => {
         setModalConfig({ type, mode, data });
         setIsModalOpen(true);
     };
