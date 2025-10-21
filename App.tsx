@@ -8,6 +8,7 @@ import Confirmation from './components/Confirmation';
 import BookingSummary from './components/BookingSummary';
 import BookingSuccess from './components/BookingSuccess';
 import AdminDashboard from './components/AdminDashboard';
+import AdminLogin from './components/AdminLogin';
 import { INITIAL_SERVICES, INITIAL_BARBERS } from './constants';
 import type { 
   Service, 
@@ -22,6 +23,7 @@ import type {
 import { convertServiceToLegacy, convertBarberToLegacy } from './types';
 
 import { getBarbeiros, getServicos, criarAgendamento } from './services/supabaseService';
+import { supabase } from './lib/supabase';
 
 // --- LocalStorage Persistence ---
 
@@ -77,6 +79,7 @@ const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('booking');
   const [currentStep, setCurrentStep] = useState(1);
   const [appointment, setAppointment] = useState<PartialAppointment>({});
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
   
   const [allAppointments, setAllAppointments] = useState<LegacyAppointment[]>(getInitialAppointments);
   const [services, setServices] = useState<LegacyService[]>(getInitialServices);
@@ -349,11 +352,25 @@ const App: React.FC = () => {
     );
   }
 
+  // Verificar sessão atual e autorizar admin
+  (async () => {
+    try {
+      const { data } = await supabase.auth.getUser();
+      const email = data.user?.email?.toLowerCase();
+      setIsAdmin(!!email && ADMIN_EMAILS.includes(email));
+    } catch (e) {
+      setIsAdmin(false);
+    }
+  })();
+
   return (
     <div className="bg-gray-900 text-white min-h-screen font-sans">
       <div className="container mx-auto p-4">
         <Header 
-          onViewChange={setCurrentView} 
+          onViewChange={(view) => {
+            // Alternar entre booking e admin; admin mostra login se não autorizado
+            setCurrentView(view);
+          }} 
           currentView={currentView}
           shopName={shopInfo.name}
           logoUrl={shopInfo.logoUrl}
@@ -400,19 +417,39 @@ const App: React.FC = () => {
             )}
           </>
         ) : (
-          <AdminDashboard 
-            appointments={allAppointments} 
-            barbers={barbers} 
-            services={services}
-            shopInfo={shopInfo}
-            onAddService={handleAddService}
-            onUpdateService={handleUpdateService}
-            onDeleteService={handleDeleteService}
-            onAddBarber={handleAddBarber}
-            onUpdateBarber={handleUpdateBarber}
-            onDeleteBarber={handleDeleteBarber}
-            onUpdateShopInfo={handleUpdateShopInfo}
-          />
+          isAdmin ? (
+            <AdminDashboard 
+              appointments={allAppointments} 
+              barbers={barbers} 
+              services={services}
+              shopInfo={shopInfo}
+              onAddService={handleAddService}
+              onUpdateService={handleUpdateService}
+              onDeleteService={handleDeleteService}
+              onAddBarber={handleAddBarber}
+              onUpdateBarber={handleUpdateBarber}
+              onDeleteBarber={handleDeleteBarber}
+              onUpdateShopInfo={handleUpdateShopInfo}
+              onSignOut={async () => {
+                await supabase.auth.signOut();
+                setIsAdmin(false);
+                setCurrentView('booking');
+              }}
+            />
+          ) : (
+            <AdminLogin 
+              onSuccess={() => {
+                // Após login, revalidar e exibir dashboard
+                (async () => {
+                  const { data } = await supabase.auth.getUser();
+                  const email = data.user?.email?.toLowerCase();
+                  setIsAdmin(!!email && ADMIN_EMAILS.includes(email));
+                })();
+                setCurrentView('admin');
+              }}
+              onCancel={() => setCurrentView('booking')}
+            />
+          )
         )}
       </div>
     </div>

@@ -16,10 +16,11 @@ interface AdminDashboardProps {
   onUpdateBarber: (barber: LegacyBarber) => void;
   onDeleteBarber: (id: number) => void;
   onUpdateShopInfo: (info: ShopInfo) => void;
+  onSignOut?: () => void; // novo: permite sair do painel
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
-  const { appointments } = props;
+  const { appointments, onSignOut } = props;
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [view, setView] = useState<'agenda' | 'management'>('agenda');
@@ -55,6 +56,15 @@ const AdminDashboard: React.FC<AdminDashboardProps> = (props) => {
           </button>
         </div>
         <h2 className="text-3xl sm:text-4xl font-bold text-amber-400">Administrador</h2>
+        {onSignOut && (
+          <button
+            onClick={onSignOut}
+            className="ml-0 sm:ml-4 px-4 py-2 text-sm font-bold rounded-full bg-gray-700 text-white hover:bg-gray-600 transition-colors duration-300"
+            title="Sair do painel"
+          >
+            Sair
+          </button>
+        )}
       </div>
       
       {view === 'agenda' ? (
